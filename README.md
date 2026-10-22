@@ -61,13 +61,27 @@ The workflow can also be started by hand: **Actions → Verse of the day → Run
 
 GitHub Pages: **Settings → Pages → Deploy from a branch → `media` / root**.
 
-**The form's Logic App** (Azure, Consumption plan; a few cents a month):
+**The form's Logic App** (Azure, Consumption plan; a few cents a month). It can live in any Azure subscription; it only needs a GitHub token.
 
-1. Create a fine-grained GitHub token: Settings → Developer settings → Fine-grained tokens → *Only select repositories*: `rise-shine-verse`, permission **Actions: Read and write**.
-2. In the Azure portal create a **Logic App (Consumption)**, open **Logic app code view**, paste [`form/logic-app.json`](form/logic-app.json), replace `PASTE-THE-GITHUB-TOKEN-HERE` with the token and `CHOOSE-A-PASSCODE-HERE` with the team's passcode, and save.
-3. Open the designer, copy the trigger's **HTTP URL** and save it as the repository variable `FORM_ENDPOINT`. Then run **Verse of the day** once so the form picks it up.
+*1. A GitHub token* that can only start this repository's workflows:
 
-The Logic App only answers this repository's GitHub Pages site, and refuses wrong passcodes. To change the passcode, edit it in code view.
+1. github.com → your profile picture → **Settings** → (bottom of the left menu) **Developer settings** → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**.
+2. **Token name** `rise-shine-form`; **Expiration** the longest offered (set a reminder to renew it); **Repository access** → *Only select repositories* → `rise-shine-verse`; **Permissions → Repository permissions → Actions**: **Read and write**. Leave everything else.
+3. **Generate token** and copy it (`github_pat_…`); GitHub shows it only once.
+
+*2. The Logic App:*
+
+1. portal.azure.com → **Create a resource** → search **Logic App** → **Create** → hosting option **Consumption** (multi-tenant).
+2. **Basics**: the subscription; resource group **Create new** `rise-shine`; name `rise-shine-form`; region e.g. **Central India**; log analytics **No**. **Review + create** → **Create** → **Go to resource**.
+3. Left menu **Development Tools → Logic app code view**. Replace everything with the contents of [`form/logic-app.json`](form/logic-app.json) ([raw](https://raw.githubusercontent.com/franklinis/rise-shine-verse/main/form/logic-app.json)).
+4. At the bottom, replace `PASTE-THE-GITHUB-TOKEN-HERE` with the token and `CHOOSE-A-PASSCODE-HERE` with the team's passcode (keep the quotation marks). **Save**.
+
+*3. Connect the form:*
+
+1. Left menu **Development Tools → Logic app designer** → click the first step, **When a HTTP request is received** → copy its **HTTP URL** (long, ends with `sig=…`).
+2. Save it as the repository variable `FORM_ENDPOINT`, then run **Actions → Verse of the day** once so the form picks it up.
+
+The Logic App only answers this repository's GitHub Pages site, and refuses wrong passcodes. To change the passcode, edit it in code view and save. When the token expires, the form says GitHub didn't accept it: make a new token and replace it in code view.
 
 ## Development
 
