@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="$lang"><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;1,400&family=Noto+Serif+Tamil:wght@400;500&family=Noto+Sans+Tamil:wght@400;500&family=Roboto:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root { --accent:$accent; --quote:$quote; --mist:#e6efed; }
+  * { box-sizing:border-box; margin:0; }
+  html, body { width:${width}px; height:${height}px; overflow:hidden; }
+  body {
+    background:$sky_top;
+    color:#fff; font-family:$sans;
+    display:flex; flex-direction:column; align-items:center; padding:$padding;
+    position:relative;
+  }
+  .bg { position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .frame { position:absolute; inset:36px; border:2px solid var(--accent); opacity:.5; border-radius:28px; pointer-events:none; z-index:1; display:$frame; }
+  .logo, .label, .date, .rule, .verse, .church { position:relative; z-index:1; }
+  .label, .date, .text, .ref, .church { text-shadow:0 2px 14px rgba(0,0,0,.4); }
+  .logo { width:170px; height:170px; }
+  .label { margin-top:30px; color:var(--accent); font-size:30px; font-weight:500; letter-spacing:$label_spacing; text-transform:uppercase; }
+  .date { margin-top:10px; color:var(--mist); font-size:26px; opacity:.85; }
+  .rule { width:120px; height:2px; background:var(--accent); opacity:.8; margin:40px 0 0; }
+  .verse { flex:1; width:100%; display:flex; flex-direction:column; justify-content:center; text-align:center; overflow:hidden; padding:24px 0; }
+  .text { font-family:$serif; font-size:${size}px; line-height:$line_height; font-weight:400; }
+  .q { color:var(--quote); }
+  /* Follow-along highlighting for narrated videos (see render.render_highlight). */
+  .mode-dim .w { color:rgba(255,255,255,.42); }
+  .mode-accent .w { color:var(--accent); }
+  .ref { margin-top:36px; color:var(--accent); font-size:36px; font-weight:500; letter-spacing:.04em; }
+  .church { margin-top:14px; color:#fff; font-family:'Roboto', sans-serif; font-size:24px; letter-spacing:.06em; opacity:.95; }
+  .church span { color:var(--accent); }
+</style></head>
+<body>
+  <div class="frame"></div>
+  $background
+  <img class="logo" src="$logo" alt="">
+  <div class="label">$label</div>
+  <div class="date">$date</div>
+  <div class="rule"></div>
+  <div class="verse" id="box"><div class="text" id="text"><span class="q">$q_open</span>$text<span class="q">$q_close</span></div><div class="ref">$reference</div></div>
+  <div class="church">$footer</div>
+<script>
+  const mode = new URLSearchParams(location.search).get('mode');
+  if (mode) document.body.classList.add('mode-' + mode);
+  // Shrink the verse until it fits its box, so long verses never overflow.
+  document.fonts.ready.then(() => {
+    const box = document.getElementById('box'), text = document.getElementById('text');
+    let size = $size;
+    // Long Tamil words cannot wrap, so check width as well as height.
+    const overflowing = () => box.scrollHeight > box.clientHeight || text.scrollWidth > text.clientWidth;
+    while (overflowing() && size > 28) { size -= 2; text.style.fontSize = size + 'px'; }
+    // Word positions, read back by render.render_highlight.
+    document.body.dataset.boxes = JSON.stringify([...document.querySelectorAll('.w')].map(w => {
+      const r = w.getBoundingClientRect();
+      return [r.left, r.top, r.width, r.height];
+    }));
+  });
+</script>
+</body></html>

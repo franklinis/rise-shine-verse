@@ -1,0 +1,31 @@
+{
+  "name": "Rise & Shine Ministries",
+  "footer": "Rise & Shine Ministries",
+  "repository": "franklinis/rise-shine-verse",
+  "languages": [
+    "ta",
+    "en"
+  ],
+  "label": {
+    "ta": "இன்றைய வசனம்",
+    "en": "Verse of the Day"
+  },
+  "website": "",
+  "voices": {
+    "ta": {
+      "female": "ta-IN-PallaviNeural",
+      "male": "ta-IN-ValluvarNeural"
+    },
+    "en": {
+      "female": "en-GB-SoniaNeural",
+      "male": "en-GB-RyanNeural"
+    }
+  },
+  "speaking_rate": "-8%",
+  "image_style": "cinematic nature photography with natural, true-to-life colours, rich detail and depth",
+  "page": {
+    "background": "#2a1a0e",
+    "card": "#3a2616",
+    "accent": "#f2b24c"
+  }
+}

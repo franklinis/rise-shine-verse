@@ -1,0 +1,153 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "githubToken": {
+        "type": "SecureString",
+        "defaultValue": ""
+      },
+      "passcode": {
+        "type": "SecureString",
+        "defaultValue": ""
+      }
+    },
+    "triggers": {
+      "Form": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "method": "POST"
+        }
+      }
+    },
+    "actions": {
+      "Check_passcode": {
+        "type": "If",
+        "runAfter": {},
+        "expression": {
+          "and": [
+            {
+              "not": {
+                "equals": [
+                  "@parameters('passcode')",
+                  ""
+                ]
+              }
+            },
+            {
+              "equals": [
+                "@coalesce(triggerFormDataValue('passcode'), '')",
+                "@parameters('passcode')"
+              ]
+            },
+            {
+              "not": {
+                "equals": [
+                  "@trim(coalesce(triggerFormDataValue('reference'), ''))",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        "actions": {
+          "Start_Verse_of_the_day": {
+            "type": "Http",
+            "runAfter": {},
+            "inputs": {
+              "method": "POST",
+              "uri": "https://api.github.com/repos/franklinis/rise-shine-verse/actions/workflows/verse.yml/dispatches",
+              "headers": {
+                "Accept": "application/vnd.github+json",
+                "Authorization": "Bearer @{parameters('githubToken')}",
+                "User-Agent": "rise-shine-verse-form",
+                "X-GitHub-Api-Version": "2022-11-28"
+              },
+              "body": {
+                "ref": "main",
+                "inputs": {
+                  "reference": "@{coalesce(triggerFormDataValue('reference'), '')}",
+                  "theme": "@{coalesce(triggerFormDataValue('theme'), '')}",
+                  "date": "@{coalesce(triggerFormDataValue('date'), '')}"
+                }
+              },
+              "retryPolicy": {
+                "type": "none"
+              }
+            }
+          },
+          "Accepted": {
+            "type": "Response",
+            "kind": "Http",
+            "runAfter": {
+              "Start_Verse_of_the_day": [
+                "Succeeded"
+              ]
+            },
+            "inputs": {
+              "statusCode": 202,
+              "headers": {
+                "Access-Control-Allow-Origin": "https://franklinis.github.io",
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "ok": true
+              }
+            }
+          },
+          "GitHub_failed": {
+            "type": "Response",
+            "kind": "Http",
+            "runAfter": {
+              "Start_Verse_of_the_day": [
+                "Failed",
+                "TimedOut"
+              ]
+            },
+            "inputs": {
+              "statusCode": 502,
+              "headers": {
+                "Access-Control-Allow-Origin": "https://franklinis.github.io",
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "ok": false,
+                "error": "GitHub didn't accept it (HTTP @{outputs('Start_Verse_of_the_day')?['statusCode']}). Please try again in a few minutes."
+              }
+            }
+          }
+        },
+        "else": {
+          "actions": {
+            "Refused": {
+              "type": "Response",
+              "kind": "Http",
+              "runAfter": {},
+              "inputs": {
+                "statusCode": 403,
+                "headers": {
+                  "Access-Control-Allow-Origin": "https://franklinis.github.io",
+                  "Content-Type": "application/json"
+                },
+                "body": {
+                  "ok": false,
+                  "error": "Wrong passcode, or no verse entered."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "outputs": {}
+  },
+  "parameters": {
+    "githubToken": {
+      "value": "PASTE-THE-GITHUB-TOKEN-HERE"
+    },
+    "passcode": {
+      "value": "CHOOSE-A-PASSCODE-HERE"
+    }
+  }
+}

@@ -1,0 +1,57 @@
+name: New background
+
+# A new verse-matched background for a day that already has its verse: Actions → New background.
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Day (YYYY-MM-DD). Empty = today."
+        required: false
+
+permissions:
+  contents: write
+
+concurrency: rise-shine-verse
+
+jobs:
+  redo:
+    runs-on: ubuntu-latest
+    env:
+      MEDIA_DIR: ${{ github.workspace }}/media
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -q -r requirements.txt
+
+      - name: Check out the media branch
+        run: git fetch -q origin media && git worktree add -q media FETCH_HEAD
+
+      - name: Paint a new background and make the day again
+        env:
+          DAY: ${{ inputs.date }}
+          NARRATION: ${{ vars.NARRATION }}
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ vars.AZURE_SPEECH_REGION }}
+          BACKGROUNDS: ${{ vars.BACKGROUNDS }}
+          AZURE_OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_IMAGE_DEPLOYMENT: ${{ vars.AZURE_IMAGE_DEPLOYMENT }}
+        run: python -m daily_verse redo --date "$DAY"
+
+      - name: Publish
+        env:
+          FORM_ENDPOINT: ${{ vars.FORM_ENDPOINT }}
+        run: |
+          python -m daily_verse page
+          cd media
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan publish
+          git add -A
+          git commit -qm "New background"
+          git push -qf origin publish:media

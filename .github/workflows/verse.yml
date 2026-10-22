@@ -1,0 +1,77 @@
+name: Verse of the day
+
+# Started each morning by the web form (form/index.html → Azure Logic App → here), or by hand:
+# Actions → Verse of the day → Run workflow. Makes the Tamil and English pictures and videos
+# and publishes them on the download page (GitHub Pages, `media` branch).
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        description: 'The verse, e.g. "Psalm 23:1", "John 3:16-17" or "Römer 8,28"'
+        required: true
+      theme:
+        description: "Optional words for the background, e.g. hope, trust"
+        required: false
+      date:
+        description: "Day (YYYY-MM-DD). Empty = today."
+        required: false
+
+permissions:
+  contents: write
+
+concurrency: rise-shine-verse
+
+jobs:
+  verse:
+    runs-on: ubuntu-latest
+    env:
+      MEDIA_DIR: ${{ github.workspace }}/media
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -q -r requirements.txt
+
+      - name: Check out the media branch
+        run: |
+          if git fetch -q origin media; then
+            git worktree add -q media FETCH_HEAD
+          else
+            git worktree add -q --detach media
+            git -C media rm -rq --cached . && git -C media clean -fdq
+          fi
+
+      - name: Make the pictures and videos
+        env:
+          REFERENCE: ${{ inputs.reference }}
+          THEME: ${{ inputs.theme }}
+          DAY: ${{ inputs.date }}
+          # Read-aloud once NARRATION is "on" and the Azure Speech settings exist.
+          NARRATION: ${{ vars.NARRATION }}
+          AZURE_SPEECH_KEY: ${{ secrets.AZURE_SPEECH_KEY }}
+          AZURE_SPEECH_REGION: ${{ vars.AZURE_SPEECH_REGION }}
+          # Verse-matched backgrounds once BACKGROUNDS is "ai" and the Azure image settings exist.
+          BACKGROUNDS: ${{ vars.BACKGROUNDS }}
+          AZURE_OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_IMAGE_DEPLOYMENT: ${{ vars.AZURE_IMAGE_DEPLOYMENT }}
+        run: python -m daily_verse verse --reference "$REFERENCE" --theme "$THEME" --date "$DAY"
+
+      - name: Publish
+        env:
+          FORM_ENDPOINT: ${{ vars.FORM_ENDPOINT }}
+        run: |
+          python -m daily_verse prune --keep-days 30
+          python -m daily_verse page
+          cd media
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # One commit holding only the last 30 days, so the repository never grows.
+          git checkout -q --orphan publish
+          git add -A
+          git commit -qm "Verse of the day: $(date +%F)"
+          git push -qf origin publish:media
