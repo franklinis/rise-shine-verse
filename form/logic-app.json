@@ -88,7 +88,6 @@
             "inputs": {
               "statusCode": 202,
               "headers": {
-                "Access-Control-Allow-Origin": "https://franklinis.github.io",
                 "Content-Type": "application/json"
               },
               "body": {
@@ -108,7 +107,6 @@
             "inputs": {
               "statusCode": 502,
               "headers": {
-                "Access-Control-Allow-Origin": "https://franklinis.github.io",
                 "Content-Type": "application/json"
               },
               "body": {
@@ -127,7 +125,6 @@
               "inputs": {
                 "statusCode": 403,
                 "headers": {
-                  "Access-Control-Allow-Origin": "https://franklinis.github.io",
                   "Content-Type": "application/json"
                 },
                 "body": {
