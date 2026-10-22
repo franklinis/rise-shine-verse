@@ -1,7 +1,7 @@
 """Verse-matched backgrounds (no Azure calls)."""
 
 import base64
-from datetime import date
+from datetime import date, timedelta
 import io
 import json
 from pathlib import Path
@@ -40,7 +40,8 @@ def test_prompt_carries_the_verse_topics_and_rules() -> None:
     text = imagery.prompt(VERSES, ["eternal life", "water"])
     assert 'Verse: "But whosoever drinketh of the water' in text and "(John 4:14)" in text
     assert "Themes: eternal life, water." in text
-    assert "no people" in text and "no text" in text and "no depictions of God" in text
+    assert "people may appear" in text and "never as close-up faces" in text  # church.json image_people
+    assert "no text" in text and "no depictions of God, Jesus, angels or named Bible characters" in text
     assert "middle third calm" in text
 
 
@@ -114,3 +115,19 @@ def test_every_palette_has_a_colour_mood() -> None:
     from daily_verse import background
 
     assert {p.name for p in background.SUNDAY + background.WEEKDAY} <= set(imagery.MOODS)
+
+
+def test_days_differ_from_the_church_s_on_the_same_date(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The church's daily verse uses the same code with no variety; this ministry's days must not line up."""
+    from daily_verse import background
+
+    days = [date(2026, 10, 1) + timedelta(days=i) for i in range(60)]
+    ours_art = [imagery.art_direction(d) for d in days]
+    ours_palette = [background.palette_for(d).name for d in days if d.weekday() != 6 and not background.feast(d)]
+    monkeypatch.setattr(imagery, "VARIETY", 0)
+    monkeypatch.setattr(background, "VARIETY", 0)
+    church_art = [imagery.art_direction(d) for d in days]
+    church_palette = [background.palette_for(d).name for d in days if d.weekday() != 6 and not background.feast(d)]
+    assert sum(a == b for a, b in zip(ours_art, church_art, strict=True)) < 15
+    assert sum(a == b for a, b in zip(ours_palette, church_palette, strict=True)) < 10
+

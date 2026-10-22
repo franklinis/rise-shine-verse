@@ -2,6 +2,7 @@
   "name": "Rise & Shine Ministries",
   "footer": "Rise & Shine Ministries",
   "repository": "franklinis/rise-shine-verse",
+  "variety": "Rise & Shine Ministries",
   "languages": [
     "ta",
     "en"
@@ -23,6 +24,7 @@
   },
   "speaking_rate": "-8%",
   "image_style": "cinematic nature photography with natural, true-to-life colours, rich detail and depth",
+  "image_people": true,
   "page": {
     "background": "#2a1a0e",
     "card": "#3a2616",

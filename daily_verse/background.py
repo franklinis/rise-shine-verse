@@ -13,6 +13,8 @@ from datetime import date, timedelta
 import math
 import random
 
+from .config import VARIETY
+
 WIDTH, HEIGHT = 1080, 1350
 
 
@@ -119,7 +121,7 @@ def _weekday_rotation(year: int, count: int) -> list[Palette]:
     cycle = 0
     while len(order) < count:
         batch = WEEKDAY[:]
-        random.Random(year * 1000 + cycle).shuffle(batch)
+        random.Random(year * 1000 + cycle + VARIETY * 7).shuffle(batch)
         if order and batch[0] == order[-1]:
             batch.append(batch.pop(0))
         order.extend(batch)
@@ -132,7 +134,7 @@ def palette_for(day: date) -> Palette:
     if name := feast(day):
         return FEAST[name]
     if day.weekday() == 6:
-        return SUNDAY[day.isocalendar().week % len(SUNDAY)]
+        return SUNDAY[(day.isocalendar().week + VARIETY) % len(SUNDAY)]
     weekdays_before = sum(
         1 for i in range((day - date(day.year, 1, 1)).days) if (date(day.year, 1, 1) + timedelta(days=i)).weekday() != 6
     )
@@ -188,7 +190,7 @@ def svg(day: date, width: int = WIDTH, height: int = HEIGHT) -> str:
     The same date gives the same scene at any size, so the feed post and the
     vertical video share their sky.
     """
-    rng = random.Random(day.toordinal())
+    rng = random.Random(day.toordinal() + VARIETY * 1_000_003)
     pal = palette_for(day)
     style = rng.choice(["rolling", "layered", "alpine"])
     layers = {"rolling": rng.randint(4, 5), "layered": rng.randint(6, 7), "alpine": rng.randint(4, 6)}[style]

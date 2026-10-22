@@ -18,6 +18,7 @@ from pathlib import Path
 import random
 import wave
 
+from .config import VARIETY
 from .render import ROOT
 
 RATE = 22050
@@ -75,7 +76,7 @@ def _add_note(buf: array, start: float, midi: int, gain: float) -> None:
 
 def compose(day: date, seconds: float, out: Path) -> Path:
     """Write a mono WAV of `seconds` length for `day`; the video step adds reverb and stereo."""
-    rng = random.Random(day.toordinal() * 7919)
+    rng = random.Random(day.toordinal() * 7919 + VARIETY)
     key = KEYS[rng.choice(sorted(KEYS))]
     progression = rng.choice(PROGRESSIONS)
     chord_len = rng.uniform(4.0, 5.5)

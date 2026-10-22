@@ -23,13 +23,23 @@ import random
 import urllib.error
 import urllib.request
 
-from .config import CHURCH
+from .config import CHURCH, VARIETY
 
 SIZE = "1088x1920"  # gpt-image-2 needs multiples of 16; slides crop to 1080 wide
 QUALITY = "medium"
+NO_PEOPLE = "no people or human figures, no faces or hands, "
+# With church.json "image_people": people can be part of the scene, but never the focus of attention:
+# faces under the verse hurt readability, and close-up AI faces and hands are where generated images look wrong.
+PEOPLE = (
+    "people may appear when they fit the verse (for example a shepherd with sheep, a family at a table, "
+    "someone walking a path, a person praying or working in a field), as ordinary present-day people who "
+    "look like the Tamil community the ministry serves; show them small or at a distance, from behind, in "
+    "silhouette or turned away, never as close-up faces or hands, and never in the middle third; "
+)
 RULES = (
-    "Rules: no people or human figures, no faces or hands, no text, letters, numbers, signs or logos, "
-    "no depictions of God, Jesus or angels, no crosses or other religious symbols, no buildings in focus. "
+    "Rules: " + (PEOPLE if CHURCH.get("image_people") else NO_PEOPLE) + "no text, letters, numbers, signs or logos, "
+    "no depictions of God, Jesus, angels or named Bible characters, no crosses or other religious symbols, "
+    "no buildings in focus. "
     "Portrait composition. Keep the middle third calm, soft and low in detail, because white text will be "
     "placed there; use a moderately low-key exposure (not bright or washed out, especially in the middle); "
     "put the main subject near the bottom or the edges."
@@ -80,7 +90,7 @@ def art_direction(day: date) -> str:
     """Today's light, season and colour mood, so a year of images doesn't all look the same."""
     from .background import feast, palette_for
 
-    rng = random.Random(day.toordinal() * 31)
+    rng = random.Random(day.toordinal() * 31 + VARIETY)
     mood = MOODS.get(palette_for(day).name, "natural colours")
     if name := feast(day):
         return f"{FEAST_DIRECTION[name]}; colour mood: {mood}"
