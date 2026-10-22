@@ -81,7 +81,7 @@ GitHub Pages: **Settings → Pages → Deploy from a branch → `media` / root**
 1. Left menu **Development Tools → Logic app designer** → click the first step, **When a HTTP request is received** → copy its **HTTP URL** (long, ends with `sig=…`).
 2. Save it as the repository variable `FORM_ENDPOINT`, then run **Actions → Verse of the day** once so the form picks it up.
 
-The Logic App only answers this repository's GitHub Pages site, and refuses wrong passcodes. To change the passcode, edit it in code view and save. When the token expires, the form says GitHub didn't accept it: make a new token and replace it in code view.
+The Logic App refuses wrong passcodes; the passcode and the secret `sig=` part of its URL are what protect it. To change the passcode, edit it in code view and save. When the token expires, the form says GitHub didn't accept it: make a new token and replace it in code view.
 
 ## Development
 
