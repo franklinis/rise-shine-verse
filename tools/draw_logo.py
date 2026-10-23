@@ -2,8 +2,9 @@
 
     python tools/draw_logo.py assets/logo-white.png preview.png
 """
-from PIL import Image, ImageDraw
 import sys
+
+from PIL import Image, ImageDraw
 
 N = 4                      # supersampling
 SIZE = 600 * N
@@ -11,8 +12,13 @@ WHITE, CLEAR = (255, 255, 255, 255), (0, 0, 0, 0)
 
 
 def bez(p0, p1, p2, p3, steps=40):
-    return [((1-t)**3*p0[0] + 3*(1-t)**2*t*p1[0] + 3*(1-t)*t**2*p2[0] + t**3*p3[0],
-             (1-t)**3*p0[1] + 3*(1-t)**2*t*p1[1] + 3*(1-t)*t**2*p2[1] + t**3*p3[1]) for t in (i/steps for i in range(steps+1))]
+    """Points along a cubic Bézier curve."""
+    points = []
+    for i in range(steps + 1):
+        t = i / steps
+        a, b, c, e = (1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3
+        points.append((a * p0[0] + b * p1[0] + c * p2[0] + e * p3[0], a * p0[1] + b * p1[1] + c * p2[1] + e * p3[1]))
+    return points
 
 
 def s(points):  # scale 600-unit design coordinates to the canvas
@@ -69,9 +75,11 @@ def draw(path, preview):
     # preview: on the slide colour, and at icon size
     canvas = Image.new("RGB", (900, 600), "#2b2f4a")
     canvas.paste(logo, (0, 0), logo)
-    small = Image.new("RGBA", (180, 180), "#3a2616"); small.alpha_composite(logo.resize((140, 140), Image.LANCZOS), (20, 20))
+    small = Image.new("RGBA", (180, 180), "#3a2616")
+    small.alpha_composite(logo.resize((140, 140), Image.LANCZOS), (20, 20))
     canvas.paste(small.convert("RGB"), (660, 40))
-    tiny = Image.new("RGBA", (64, 64), "#3a2616"); tiny.alpha_composite(logo.resize((52, 52), Image.LANCZOS), (6, 6))
+    tiny = Image.new("RGBA", (64, 64), "#3a2616")
+    tiny.alpha_composite(logo.resize((52, 52), Image.LANCZOS), (6, 6))
     canvas.paste(tiny.convert("RGB"), (720, 280))
     canvas.save(preview)
 
