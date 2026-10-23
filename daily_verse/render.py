@@ -22,7 +22,7 @@ from .config import CHURCH, ROOT
 from .sources import Verse
 
 TEMPLATE = Template((Path(__file__).parent / "template.html").read_text(encoding="utf-8"))
-LOGO = ROOT / "assets" / "logo-white.png"
+LOGO = ROOT / "assets" / "logo.png"
 
 LANGUAGES = {
     "ta": {

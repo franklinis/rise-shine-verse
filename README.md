@@ -27,7 +27,7 @@ The form shows when it's ready (about 3–5 minutes) and links to the download p
 
 ## Design
 
-The same slide design as [clp-daily-verse](https://github.com/franklinis/clp-daily-verse): 39 colour palettes (feast-day palettes for Christmas, Easter and Pentecost), and, with `BACKGROUNDS` = `ai`, a background painted for each verse by an Azure image model (calm nature scenes; no people, text or depictions of God). The logo is `assets/logo-white.png` (a white logo on a transparent background, square); the name, titles, voices and page colours are in `church.json`.
+The same slide design as [clp-daily-verse](https://github.com/franklinis/clp-daily-verse): 39 colour palettes (feast-day palettes for Christmas, Easter and Pentecost), and, with `BACKGROUNDS` = `ai`, a background painted for each verse by an Azure image model (calm nature scenes; no people, text or depictions of God). The logo is `assets/logo.png` (square, transparent background; made with **Actions → Logo options**, which asks the image model for colour designs); the name, titles, voices and page colours are in `church.json`.
 
 | Language | Text | Voice |
 |---|---|---|

@@ -57,12 +57,12 @@ def collect(media: Path) -> list[dict]:
 
 
 def _icon(out: Path) -> None:
-    """Home-screen icon: the white logo on the page colour."""
+    """Home-screen icon: the logo on the page colour."""
     from PIL import Image
 
-    logo = Image.open(ROOT / "assets" / "logo-white.png").convert("RGBA").resize((400, 400), Image.LANCZOS)
+    logo = Image.open(ROOT / "assets" / "logo.png").convert("RGBA").resize((440, 440), Image.LANCZOS)
     icon = Image.new("RGBA", (512, 512), CHURCH["page"]["card"])
-    icon.alpha_composite(logo, (56, 56))
+    icon.alpha_composite(logo, (36, 36))
     icon.convert("RGB").save(out)
 
 
