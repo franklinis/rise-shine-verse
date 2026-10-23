@@ -1,0 +1,33 @@
+name: Logo options
+
+# Generates colour logo options with the image model; download them from the run page (Artifacts).
+on:
+  workflow_dispatch:
+    inputs:
+      wishes:
+        description: "Optional extra wishes for the design"
+        required: false
+
+jobs:
+  logo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Generate the options
+        env:
+          WISHES: ${{ inputs.wishes }}
+          AZURE_OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_IMAGE_DEPLOYMENT: ${{ vars.AZURE_IMAGE_DEPLOYMENT }}
+        run: python tools/logo_ai.py logo-options "$WISHES"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: logo-options
+          path: logo-options/*.png
+          retention-days: 14
