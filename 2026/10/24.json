@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-24",
+  "reference": "Psalm 147:3",
+  "verses": {
+    "ta": {
+      "lang": "ta",
+      "reference": "சங்கீதம் 147:3",
+      "text": "இருதயம் நொறுங்குண்டவர்களைக் குணமாக்குகிறார், அவர்களுடைய காயங்களைக் கட்டுகிறார்."
+    },
+    "en": {
+      "lang": "en",
+      "reference": "Psalm 147:3",
+      "text": "He healeth the broken in heart, and bindeth up their wounds."
+    }
+  },
+  "topics": [],
+  "images": {
+    "ta": "2026/10/24-ta.png",
+    "en": "2026/10/24-en.png"
+  },
+  "videos": {
+    "ta": "2026/10/24-ta.mp4",
+    "en": "2026/10/24-en.mp4"
+  },
+  "scene": "2026/10/24-scene.jpg",
+  "narrated": true,
+  "revision": 0
+}
