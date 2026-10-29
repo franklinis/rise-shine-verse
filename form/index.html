@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Enter the verse · Rise &amp; Shine Ministries</title>
+<meta name="theme-color" content="#3a2616">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../icon.png">
+<link rel="apple-touch-icon" href="../icon.png">
+<style>
+  :root { color-scheme: dark; --bg: #2a1a0e; --card: #3a2616; --accent: #f2b24c; --text: #fff; --muted: rgba(255,255,255,.72);
+          --line: rgba(255,255,255,.14); --ok: #25d366; --bad: #ff8a80; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Tamil", sans-serif;
+         padding: env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom)); }
+  main { max-width: 480px; margin: 0 auto; }
+  header { display: flex; align-items: center; gap: 12px; padding: 20px 0 12px; }
+  header img { width: 44px; height: 44px; border-radius: 10px; }
+  h1 { font-size: 20px; margin: 0; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  form { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+  label { display: block; font-weight: 600; margin: 14px 0 6px; }
+  label:first-child { margin-top: 0; }
+  .hint { color: var(--muted); font-size: 13px; font-weight: 400; }
+  input { width: 100%; font: inherit; color: var(--text); background: rgba(0,0,0,.25); border: 1px solid var(--line);
+          border-radius: 12px; padding: 12px; min-height: 48px; }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .remember { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-weight: 400; font-size: 14px; color: var(--muted); }
+  .remember input { width: auto; min-height: 0; }
+  button { width: 100%; margin-top: 18px; font: inherit; font-weight: 700; border: 0; border-radius: 12px; min-height: 52px;
+           background: var(--accent); color: #241505; cursor: pointer; }
+  button[disabled] { opacity: .6; cursor: wait; }
+  #status { margin-top: 14px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); display: none; }
+  #status.show { display: block; }
+  #status.ok { border-color: var(--ok); }
+  #status.bad { border-color: var(--bad); }
+  #status a { color: var(--accent); font-weight: 600; }
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 20px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="../icon.png" alt="">
+    <div><h1>Verse of the Day</h1><p>Rise &amp; Shine Ministries</p></div>
+  </header>
+  <form id="form" autocomplete="on">
+    <label for="reference">Bible verse <span class="hint">· English, Tamil or German</span></label>
+    <input id="reference" name="reference" required placeholder="Psalm 23:1 · சங்கீதம் 23:1" autocapitalize="words">
+    <label for="theme">Theme <span class="hint">· optional, guides the background picture</span></label>
+    <input id="theme" name="theme" placeholder="hope, trust">
+    <label for="date">Day</label>
+    <input id="date" name="date" type="date" required>
+    <label for="passcode">Passcode</label>
+    <input id="passcode" name="passcode" type="password" required autocomplete="current-password">
+    <label class="remember"><input id="remember" type="checkbox"> Remember the passcode on this phone</label>
+    <button id="send" type="submit">Make today's verse</button>
+  </form>
+  <div id="status" role="status" aria-live="polite"></div>
+  <footer><a href="../">Open the download page</a></footer>
+</main>
+<script>
+  const ENDPOINT = "https://prod-11.centralindia.logic.azure.com:443/workflows/5a325dcebe3c4ce793e0054d7ec1d193/triggers/Form/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FForm%2Frun&sv=1.0&sig=zkZnvEnNumgqGp1RNiNMhtRQsS3ji5aOiKiz9R2JpZo";
+  const RUNS = "https://api.github.com/repos/franklinis/rise-shine-verse/actions/workflows/verse.yml/runs?per_page=10&event=workflow_dispatch";
+  const $ = id => document.getElementById(id);
+  const store = {
+    get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} },
+  };
+
+  $('date').value = new Date().toLocaleDateString('sv-SE');  // today, in the phone's time zone
+  if (store.get('passcode')) { $('passcode').value = store.get('passcode'); $('remember').checked = true; }
+
+  function show(html, kind) {
+    const el = $('status');
+    el.innerHTML = html;
+    el.className = 'show ' + (kind || '');
+  }
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  // Follow the GitHub run that this verse started (public repository: no login needed).
+  async function follow(sentAt) {
+    const deadline = Date.now() + 15 * 60 * 1000;
+    let run = null;
+    while (Date.now() < deadline) {
+      await sleep(run ? 15000 : 6000);
+      try {
+        const data = await (await fetch(RUNS, { cache: 'no-store' })).json();
+        run = (data.workflow_runs || []).find(r => new Date(r.created_at) >= sentAt - 60000) || run;
+      } catch (e) { continue; }
+      if (!run) { show('Sent. Waiting for it to start…'); continue; }
+      if (run.status !== 'completed') {
+        show('Making the Tamil and English pictures and videos… This takes about 3–5 minutes. You can leave this page open.');
+        continue;
+      }
+      if (run.conclusion === 'success') {
+        show('✅ Ready! <a href="../?t=' + Date.now() + '">Open the download page</a>' +
+             '<br><span class="hint">If it still shows the old verse, wait a minute and reload.</span>', 'ok');
+      } else {
+        show('⚠️ That didn\'t work. Usually the verse wasn\'t recognised: check it (e.g. “John 3:16” or “யோவான் 3:16”) ' +
+             'and send it again. <a href="' + run.html_url + '">Details</a>', 'bad');
+      }
+      return;
+    }
+    show('This is taking longer than usual. <a href="../">Check the download page</a> in a few minutes.', 'bad');
+  }
+
+  $('form').addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!ENDPOINT || ENDPOINT.startsWith('__')) { show('The form isn\'t connected yet (FORM_ENDPOINT is missing).', 'bad'); return; }
+    store.set('passcode', $('remember').checked ? $('passcode').value : null);
+    const body = new URLSearchParams({
+      reference: $('reference').value.trim(), theme: $('theme').value.trim(),
+      date: $('date').value, passcode: $('passcode').value,
+    });
+    $('send').disabled = true;
+    show('Sending…');
+    const sentAt = Date.now();
+    try {
+      // A plain form post: no CORS preflight, so the Logic App only needs to allow this page's origin.
+      const response = await fetch(ENDPOINT, { method: 'POST', body });
+      const answer = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        show('⚠️ ' + (answer.error || 'It wasn\'t accepted (HTTP ' + response.status + ').'), 'bad');
+        return;
+      }
+      show('Sent. Waiting for it to start…');
+      await follow(sentAt);
+    } catch (e) {
+      show('⚠️ Couldn\'t reach the server. Check the internet connection and try again.', 'bad');
+    } finally {
+      $('send').disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-29",
+  "reference": "Psalm 147:12",
+  "verses": {
+    "ta": {
+      "lang": "ta",
+      "reference": "சங்கீதம் 147:12",
+      "text": "எருசலேமே, கர்த்தரை ஸ்தோத்திரி; சீயோனே, உன் தேவனைத் துதி."
+    },
+    "en": {
+      "lang": "en",
+      "reference": "Psalm 147:12",
+      "text": "Praise the LORD, O Jerusalem; praise thy God, O Zion."
+    }
+  },
+  "topics": [],
+  "images": {
+    "ta": "2026/10/29-ta.png",
+    "en": "2026/10/29-en.png"
+  },
+  "videos": {
+    "ta": "2026/10/29-ta.mp4",
+    "en": "2026/10/29-en.mp4"
+  },
+  "scene": "2026/10/29-scene.jpg",
+  "narrated": true,
+  "revision": 0
+}
