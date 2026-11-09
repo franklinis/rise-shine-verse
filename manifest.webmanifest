@@ -1,0 +1,15 @@
+{
+  "name": "Verse of the Day · Rise & Shine Ministries",
+  "short_name": "Verse of the Day",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#2a1a0e",
+  "theme_color": "#3a2616",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

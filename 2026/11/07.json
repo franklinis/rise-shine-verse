@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-07",
+  "reference": "Psalm 9:9",
+  "verses": {
+    "ta": {
+      "lang": "ta",
+      "reference": "சங்கீதம் 9:9",
+      "text": "சிறுமைப்பட்டவனுக்குக் கர்த்தர் அடைக்கலமானவர்; நெருக்கப்படுகிற காலங்களில் அவரே தஞ்சமானவர்."
+    },
+    "en": {
+      "lang": "en",
+      "reference": "Psalm 9:9",
+      "text": "The LORD also will be a refuge for the oppressed, a refuge in times of trouble."
+    }
+  },
+  "topics": [],
+  "images": {
+    "ta": "2026/11/07-ta.png",
+    "en": "2026/11/07-en.png"
+  },
+  "videos": {
+    "ta": "2026/11/07-ta.mp4",
+    "en": "2026/11/07-en.mp4"
+  },
+  "scene": "2026/11/07-scene.jpg",
+  "narrated": true,
+  "revision": 1
+}

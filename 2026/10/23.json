@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-23",
+  "reference": "Psalm 145:14",
+  "verses": {
+    "ta": {
+      "lang": "ta",
+      "reference": "சங்கீதம் 145:14",
+      "text": "கர்த்தர் விழுகிற யாவரையும் தாங்கி, மடங்கடிக்கப்பட்ட யாவரையும் தூக்கிவிடுகிறார்."
+    },
+    "en": {
+      "lang": "en",
+      "reference": "Psalm 145:14",
+      "text": "The LORD upholdeth all that fall, and raiseth up all those that be bowed down."
+    }
+  },
+  "topics": [],
+  "images": {
+    "ta": "2026/10/23-ta.png",
+    "en": "2026/10/23-en.png"
+  },
+  "videos": {
+    "ta": "2026/10/23-ta.mp4",
+    "en": "2026/10/23-en.mp4"
+  },
+  "scene": "2026/10/23-scene.jpg",
+  "narrated": true,
+  "revision": 3
+}
